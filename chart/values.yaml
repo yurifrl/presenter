@@ -1,0 +1,29 @@
+# Single replica only: peers/connections are tracked in-memory per pod, so a
+# WebSocket broadcast does not cross pods. Scale-out would need shared pub/sub.
+image:
+  repository: ghcr.io/yurifrl/presenter
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+service:
+  port: 7737
+
+# Plain env vars (non-secret). Secrets should come via envFrom (e.g. an
+# ExternalSecret-backed Secret) so nothing sensitive lives in the chart.
+env: {}
+#  ADMIN_EMAIL: admin
+#  GOOGLE_REDIRECT_URI: https://presenter.example.com/auth/google/callback
+
+envFrom: []
+#  - secretRef:
+#      name: presenter
+
+# Encrypted SQLite (libSQL) lives here; keep it persistent.
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: ""
+
+resources: {}

@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/dist
+*.sqlite
+*.sqlite-*
+.env
+.env.op
+.git
+.github
+docs
+sample
+**/*.test.ts
+server/e2e.ts

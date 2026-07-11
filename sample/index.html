@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Presenter sample deck</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #111; color: #eee; font: 2rem/1.4 system-ui, sans-serif; }
+    .slide { display: none; height: 100%; box-sizing: border-box; padding: 6vh 8vw; }
+    .slide.active { display: flex; flex-direction: column; justify-content: center; }
+    h1 { font-size: 3rem; margin: 0 0 1rem; }
+    .hint { position: fixed; bottom: 1rem; right: 1.5rem; font-size: 0.9rem; opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <section class="slide" id="intro"><h1>Presenter</h1><p>One script. Any deck. Acts like a clicker.</p></section>
+  <section class="slide" id="how"><h1>How</h1><p>play.js turns remote commands into arrow-key presses.</p></section>
+  <section class="slide" id="goto"><h1>Goto</h1><p>Jump straight to a slide by name via <code>#hash</code>.</p></section>
+  <section class="slide" id="end"><h1>Done</h1><p>Framework-agnostic and plug-and-play.</p></section>
+
+  <div class="hint">← / → to navigate · #slidename to jump</div>
+
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    function show(id) {
+      const target = slides.find((s) => s.id === id) || slides[0];
+      slides.forEach((s) => s.classList.toggle("active", s === target));
+    }
+    function showIndex(i) {
+      const clamped = Math.max(0, Math.min(slides.length - 1, i));
+      location.hash = slides[clamped].id;
+    }
+    function currentIndex() {
+      const id = location.hash.slice(1);
+      const i = slides.findIndex((s) => s.id === id);
+      return i < 0 ? 0 : i;
+    }
+    addEventListener("hashchange", () => show(location.hash.slice(1)));
+    addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "PageDown") showIndex(currentIndex() + 1);
+      if (e.key === "ArrowLeft" || e.key === "PageUp") showIndex(currentIndex() - 1);
+    });
+    show(location.hash.slice(1) || slides[0].id);
+  </script>
+
+  <!--
+    play.js embed. This deck is the demonstration that play.js is plug-and-play:
+    it needs no deck-specific wiring because play.js emulates a hardware clicker
+    (synthetic ArrowLeft/ArrowRight + PageUp/PageDown) and, for goto, sets
+    location.hash and fires a "presenter:goto" CustomEvent.
+
+    Author: swap data-url + data-token for your real server URL and the
+    presentation token from the admin. Then next/prev/goto from the admin
+    (or window.Presenter.next() in the console) drives this deck live.
+
+    Reveal.js / impress.js work with the same embed unchanged, since they also
+    listen for those arrow keys — no alternative CDN dependency required here.
+  -->
+  <script src="/play.js"
+          data-url="ws://localhost:7737/ws"
+          data-token="REPLACE_WITH_PRESENTATION_TOKEN"></script>
+</body>
+</html>

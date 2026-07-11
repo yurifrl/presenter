@@ -1,0 +1,11 @@
+{
+  "name": "presenter",
+  "private": true,
+  "workspaces": ["server", "web", "play"],
+  "scripts": {
+    "dev": "bun run build && bun server/src/index.ts",
+    "build": "bun run --cwd play build && bun run --cwd web build",
+    "dev:server": "bun run --cwd server dev",
+    "dev:web": "bun run --cwd web dev"
+  }
+}
