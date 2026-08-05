@@ -27,3 +27,10 @@ persistence:
   storageClass: ""
 
 resources: {}
+
+# Pod scheduling. The published image is currently amd64-only, so consumers on
+# mixed-arch clusters should pin to amd64 nodes, e.g.:
+#   nodeSelector: {kubernetes.io/arch: amd64}
+nodeSelector: {}
+affinity: {}
+tolerations: []
