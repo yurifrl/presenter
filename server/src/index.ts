@@ -9,7 +9,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import {
   openDb, createPresentation, presentationByToken,
-  checkKeyphrase, setCurrentSlide, isExpired,
+  checkKeyphrase, setCurrentSlide, updateScript, isExpired,
   type Presentation,
 } from "./db";
 import { makeSession, readSession } from "./session";
@@ -138,7 +138,14 @@ app.post("/api/presentations", async (c) => {
   return c.json(createPresentation(db, name, keyphrase, ttlSeconds));
 });
 
-app.delete("/api/presentations/:id", (c) => {
+app.post("/api/presentations/:id/script", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  if (typeof body.script !== "string") return c.json({ error: "script must be a string" }, 400);
+  updateScript(db, c.req.param("id"), body.script);
+  return c.json(db.query("SELECT * FROM presentations WHERE id = ?").get(c.req.param("id")));
+});
+
+
   db.run("DELETE FROM presentations WHERE id = ?", [c.req.param("id")]);
   return c.json({ ok: true });
 });

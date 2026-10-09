@@ -74,7 +74,11 @@ input:focus { outline: 2px solid #c7d2fe; border-color: var(--accent); }
 .create-form { display: flex; gap: .5rem; padding: 1rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
 .create-form input { flex: 1; min-width: 140px; }
 
-/* Control view */
+textarea { width: 100%; resize: vertical; padding: .7rem; border: 1px solid var(--border); border-radius: 8px; font: inherit; }
+.script-card { padding: 1.25rem; margin-bottom: 1.5rem; }
+.script-card h3 { margin: 0 0 .4rem; }
+.script-actions { display: flex; justify-content: space-between; align-items: center; margin-top: .7rem; }
+
 .control-card { padding: 1.25rem; margin-bottom: 1.5rem; }
 .controls { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: .4rem; }

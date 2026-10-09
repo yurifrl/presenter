@@ -3,7 +3,7 @@ export type Presentation = {
   name: string;
   keyphrase: string;
   token: string;
-  current_slide: string | null;
+  script: string;
   created_at: string;
 };
 
@@ -46,6 +46,8 @@ export const api = {
     req<void>("POST", `/api/presentations/${id}/renew`, { ttlSeconds }),
   deletePresentation: (id: string) =>
     req<void>("DELETE", `/api/presentations/${id}`),
+  updateScript: (id: string, script: string) =>
+    req<Presentation>("POST", `/api/presentations/${id}/script`, { script }),
   status: (id: string) =>
     req<Status>("GET", `/api/presentations/${id}/status`),
   cmd: (id: string, cmd: "next" | "prev" | "goto", value?: string) =>

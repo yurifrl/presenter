@@ -8,6 +8,7 @@ import {
   type Presentation,
   type Status,
 } from "./api";
+import { parseAnchors } from "./teleprompter";
 
 function usePath(): string {
   const [path, setPath] = useState(window.location.pathname);
@@ -226,11 +227,16 @@ function Presentations() {
 
 function Control({ id }: { id: string }) {
   const [p, setP] = useState<Presentation | null | undefined>(undefined);
+  const [script, setScript] = useState("");
   const [status, setStatus] = useState<Status>({ peers: 0, current: null });
   const [goto, setGoto] = useState("");
 
   useEffect(() => {
-    api.presentations().then((rows) => setP(rows.find((r) => r.id === id) ?? null)).catch(() => setP(null));
+    api.presentations().then((rows) => {
+      const found = rows.find((r) => r.id === id) ?? null;
+      setP(found);
+      setScript(found?.script ?? "");
+    }).catch(() => setP(null));
   }, [id]);
 
   useEffect(() => {
@@ -276,7 +282,17 @@ function Control({ id }: { id: string }) {
         </div>
       </div>
 
-      <h3>Embed in your deck</h3>
+      <div className="card script-card">
+        <h3>Teleprompter script</h3>
+        <p className="muted">Use one anchor per line: <code>[[slide:intro]]</code></p>
+        <textarea value={script} onChange={(e) => setScript(e.target.value)} rows={10} placeholder="[[slide:intro]]\nWelcome" />
+        <div className="script-actions">
+          <span className="muted">{parseAnchors(script).length} anchors</span>
+          <button className="btn" onClick={async () => { const updated = await api.updateScript(p.id, script); setP(updated); }}>Save script</button>
+        </div>
+      </div>
+
+
       <p className="muted">Paste this before <code>&lt;/body&gt;</code>. On open it prompts for the keyphrase <b>{p.keyphrase}</b>.</p>
       <pre>{snippet}</pre>
       <button className="btn" onClick={() => navigator.clipboard.writeText(snippet)}>Copy snippet</button>

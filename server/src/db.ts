@@ -42,9 +42,15 @@ export function openDb(path: string, encryptionKey?: string): Db {
     keyphrase TEXT,
     token TEXT UNIQUE,
     current_slide TEXT,
+    script TEXT NOT NULL DEFAULT '',
     expires_at INTEGER,
     created_at INTEGER
   )`);
+  // Migrate databases created before teleprompter scripts were introduced.
+  const columns = db.query("PRAGMA table_info(presentations)").all() as Array<{ name: string }>;
+  if (!columns.some((column) => column.name === "script")) {
+    db.exec("ALTER TABLE presentations ADD COLUMN script TEXT NOT NULL DEFAULT ''");
+  }
   return db;
 }
 
@@ -54,6 +60,7 @@ export type Presentation = {
   keyphrase: string;
   token: string;
   current_slide: string | null;
+  script: string;
   expires_at: number | null;
   created_at: number;
 };
@@ -65,12 +72,13 @@ export function createPresentation(db: Db, name: string, keyphrase: string, ttlS
     keyphrase,
     token: genToken(),
     current_slide: null,
+    script: "",
     expires_at: ttlSeconds ? Date.now() + ttlSeconds * 1000 : null,
     created_at: Date.now(),
   };
   db.run(
-    "INSERT INTO presentations (id,name,keyphrase,token,current_slide,expires_at,created_at) VALUES (?,?,?,?,?,?,?)",
-    [row.id, row.name, row.keyphrase, row.token, row.current_slide, row.expires_at, row.created_at],
+    "INSERT INTO presentations (id,name,keyphrase,token,current_slide,script,expires_at,created_at) VALUES (?,?,?,?,?,?,?,?)",
+    [row.id, row.name, row.keyphrase, row.token, row.current_slide, row.script, row.expires_at, row.created_at],
   );
   return row;
 }
@@ -85,4 +93,8 @@ export function checkKeyphrase(p: Presentation | null, keyphrase: string): boole
 
 export function setCurrentSlide(db: Db, id: string, value: string | null): void {
   db.run("UPDATE presentations SET current_slide = ? WHERE id = ?", [value, id]);
+}
+
+export function updateScript(db: Db, id: string, script: string): void {
+  db.run("UPDATE presentations SET script = ? WHERE id = ?", [script, id]);
 }
