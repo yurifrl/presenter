@@ -146,6 +146,7 @@ app.post("/api/presentations/:id/script", async (c) => {
 });
 
 
+app.delete("/api/presentations/:id", (c) => {
   db.run("DELETE FROM presentations WHERE id = ?", [c.req.param("id")]);
   return c.json({ ok: true });
 });
